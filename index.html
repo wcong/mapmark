@@ -21,6 +21,7 @@ body {
   min-height:767px;
 }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
 <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=6LLBZ-QMLCX-HNA4L-T3ADN-4O3V5-BFFLB"></script>
 <script charset="utf-8" src="./mark.js"></script>
 <script>
@@ -30,12 +31,14 @@ body {
 </script>
 </head>
     <body>
+        <form class="pure-form">
+            <fieldset>
+                <input id="address" type="textbox" value="上海体育馆">
+                <button onclick="codeAddress()" class="pure-button pure-button-primary">search</button>
+            </fieldset>
+        </form>
         <div>
-            <input id="address" type="textbox" value="上海体育馆">
-            <button onclick="codeAddress()">search</button>
-        </div>
-        <div>
-            <table id = "mark_table">
+            <table id = "mark_table" class="pure-table pure-table-horizontal">
                 <thead>
                     <td>序号</td>
                     <td>经纬度</td>
