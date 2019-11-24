@@ -25,30 +25,68 @@ function init() {
     geocoder.setError(function() {
         alert("出错了，请输入正确的地址！！！");
     });
+    loadMarkList();
+}
+
+function loadMarkList(){
+    var storage = window.localStorage;
+    if( storage['markList'] == null || storage['markList'] =='' || storage['markList'] === undefined){
+        window.localStorage['markList'] = JSON.stringify([]);
+        return;
+    }
+    var markList = JSON.parse(storage['markList']);
+    for( var i = 0 ; i < markList.length ; i++ ){
+        insertIntoTable(markList[i].address,new qq.maps.LatLng(parseFloat(markList[i].latitude), parseFloat(markList[i].longtitude)),markList[i].dateTime);
+    }
 }
 
 function insertNewRow(address,location){
+    var currentDate = getCurrentDate();
+    insertIntoTable(address,location,currentDate);
+    var newItem = {};
+    newItem.dateTime = currentDate;
+    newItem.latitude = location.getLat();
+    newItem.longtitude = location.getLng();
+    newItem.address = address;
+    newItem.order = length;
+    var storage = JSON.parse(window.localStorage['markList']);
+    storage.push(newItem);
+    window.localStorage['markList'] = JSON.stringify(storage);
+}
+
+function insertIntoTable(address,location,currentDate){
     var markTable = document.getElementById("mark_table");
     var length = markTable.rows.length;
     var newRow = markTable.insertRow(length);
+    newRow.setAttribute('draggable',true);
     newRow.insertCell(0).innerHTML = length;
-    newRow.insertCell(1).innerHTML = location;
-    newRow.insertCell(2).innerHTML = address;
-    newRow.insertCell(3).innerHTML = "";
-    newRow.insertCell(4).innerHTML = "<button onclick='deleteSelf()'>删除</button>";
+    newRow.insertCell(1).innerHTML = "<input type='datetime-local'/>";
+    newRow.cells[1].firstChild.value = currentDate;
+    newRow.insertCell(2).innerHTML = location;
+    newRow.insertCell(3).innerHTML = address;
+    newRow.insertCell(4).innerHTML = "<input type='textbox' placehold='详情'/>";
+    newRow.insertCell(5).innerHTML = "<input type='textbox' placehold='下一步'/>";
+    newRow.insertCell(6).innerHTML = "<button onclick='deleteSelf()' class='pure-button pure-button-primary'>删除</button>";
     if( length>1 ){
         drawLine(markTable,length,location);
     }
 }
 
+
+function getCurrentDate(){
+    var time = new Date();
+    var day = ("0" + time.getDate()).slice(-2);
+    var month = ("0" + (time.getMonth() + 1)).slice(-2);
+    return time.getFullYear() + "-" + (month) + "-" + (day)+ 'T00:00';
+}
+
 function drawLine(markTable,newIndex,newLocation){
     var lastRow = markTable.rows[newIndex-1];
-    var location = lastRow.cells[1].innerHTML;
+    var location = lastRow.cells[2].innerHTML;
     var locationArray = location.split(',');
     var polyline = new qq.maps.Polyline({
         path: [
-            new qq.maps.LatLng(parseFloat(locationArray[0]), parseFloat(locationArray[1])),
-            newLocation
+            new qq.maps.LatLng(parseFloat(locationArray[0]), parseFloat(locationArray[1])),newLocation
         ],
         strokeColor: new qq.maps.Color(0, 0, 0, 0.5),
         strokeWeight: 3,
